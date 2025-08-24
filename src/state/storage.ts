@@ -1,7 +1,8 @@
 import { FSState } from "./fsTypes";
 import { createInitialState } from "./helpers";
+import { STORAGE_KEYS } from "../constants";
 
-const FS_STORAGE_KEY = "fs";
+const FS_STORAGE_KEY = STORAGE_KEYS.FILE_SYSTEM;
 
 export const saveToStorage = (state: FSState): void => {
   try {

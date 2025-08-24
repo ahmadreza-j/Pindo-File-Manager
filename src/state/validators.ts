@@ -1,6 +1,7 @@
 import { FSState, FSNode, ValidationError } from "./fsTypes";
+import { FORBIDDEN_CHARS_REGEX } from "../constants";
 
-const FORBIDDEN_CHARS = /[/\\:*?"<>|]/;
+const FORBIDDEN_CHARS = FORBIDDEN_CHARS_REGEX;
 
 export const validateName = (name: string): ValidationError | null => {
   const trimmed = name.trim();

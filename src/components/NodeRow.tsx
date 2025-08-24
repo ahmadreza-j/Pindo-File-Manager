@@ -1,6 +1,7 @@
-import { type FC, useState } from "react";
+import { type FC, useState, memo } from "react";
 import { FSNode } from "../state/fsTypes";
 import { useFS } from "../state/fsContext";
+import { TREE_INDENTATION } from "../constants";
 
 interface NodeRowProps {
   node: FSNode;
@@ -11,7 +12,7 @@ interface NodeRowProps {
   onDeleteNode: (nodeId: string) => void;
 }
 
-export const NodeRow: FC<NodeRowProps> = ({
+const NodeRowComponent: FC<NodeRowProps> = ({
   node,
   depth,
   onAddFolder,
@@ -122,10 +123,24 @@ export const NodeRow: FC<NodeRowProps> = ({
 
   return (
     <div className="node-row">
-      <div className="node-content" style={{ paddingLeft: `${depth * 20}px` }}>
+      <div className="node-content" style={{ paddingLeft: `${depth * TREE_INDENTATION}px` }}>
         <span
           className="node-toggle"
           onClick={handleToggleExpanded}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleToggleExpanded();
+            }
+          }}
+          tabIndex={node.type === "folder" ? 0 : -1}
+          role={node.type === "folder" ? "button" : undefined}
+          aria-expanded={node.type === "folder" ? isExpanded : undefined}
+          aria-label={
+            node.type === "folder"
+              ? `${isExpanded ? "Collapse" : "Expand"} ${node.name} folder`
+              : undefined
+          }
           style={{
             cursor: node.type === "folder" ? "pointer" : "default",
             opacity: node.type === "folder" ? 1 : 0.5,
@@ -140,3 +155,5 @@ export const NodeRow: FC<NodeRowProps> = ({
     </div>
   );
 };
+
+export const NodeRow = memo(NodeRowComponent);

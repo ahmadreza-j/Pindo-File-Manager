@@ -1,15 +1,15 @@
 import { type FC, useEffect } from "react";
 import { useFS } from "../state/fsContext";
+import { TOAST_DURATION } from "../constants";
 
 export const Toasts: FC = () => {
   const { state, dispatch } = useFS();
 
   useEffect(() => {
-    // Auto-remove toasts after 4 seconds
     const timers = state.toasts.map((toast) => {
       return setTimeout(() => {
         dispatch({ type: "REMOVE_TOAST", payload: { toastId: toast.id } });
-      }, 4000);
+      }, TOAST_DURATION);
     });
 
     return () => {
