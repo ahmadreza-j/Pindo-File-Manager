@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { useFS } from '../state/fsContext';
-import { NodeRow } from './NodeRow';
-import { DialogCreateFolder } from './DialogCreateFolder';
-import { DialogCreateFile } from './DialogCreateFile';
-import { DialogRenameFile } from './DialogRenameFile';
-import { ConfirmDeleteDialog } from './ConfirmDeleteDialog';
+import { type FC, useState } from "react";
+import { useFS } from "../state/fsContext";
+import { NodeRow } from "./NodeRow";
+import { DialogCreateFolder } from "./DialogCreateFolder";
+import { DialogCreateFile } from "./DialogCreateFile";
+import { DialogRenameFile } from "./DialogRenameFile";
+import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
 
-export const Tree: React.FC = () => {
+export const Tree: FC = () => {
   const { state } = useFS();
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [showCreateFile, setShowCreateFile] = useState(false);
   const [showRenameFile, setShowRenameFile] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [selectedParentId, setSelectedParentId] = useState<string>('');
-  const [selectedFileId, setSelectedFileId] = useState<string>('');
-  const [selectedNodeId, setSelectedNodeId] = useState<string>('');
+  const [selectedParentId, setSelectedParentId] = useState<string>("");
+  const [selectedFileId, setSelectedFileId] = useState<string>("");
+  const [selectedNodeId, setSelectedNodeId] = useState<string>("");
 
   const rootNode = state.nodes[state.rootId];
-  
+
   if (!rootNode) {
     return <div>No root node found</div>;
   }

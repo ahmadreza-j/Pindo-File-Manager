@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import { useFS } from '../state/fsContext';
+import { type FormEvent, type FC, type MouseEvent, useState } from "react";
+import { useFS } from "../state/fsContext";
 
 interface DialogCreateFolderProps {
   parentId: string;
   onClose: () => void;
 }
 
-export const DialogCreateFolder: React.FC<DialogCreateFolderProps> = ({
+export const DialogCreateFolder: FC<DialogCreateFolderProps> = ({
   parentId,
-  onClose
+  onClose,
 }) => {
   const { dispatch } = useFS();
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     dispatch({
-      type: 'ADD_FOLDER',
-      payload: { parentId, name }
+      type: "ADD_FOLDER",
+      payload: { parentId, name },
     });
     onClose();
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -33,7 +33,9 @@ export const DialogCreateFolder: React.FC<DialogCreateFolderProps> = ({
       <div className="dialog">
         <div className="dialog-header">
           <h3>Create New Folder</h3>
-          <button onClick={onClose} className="close-btn">×</button>
+          <button onClick={onClose} className="close-btn">
+            ×
+          </button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">

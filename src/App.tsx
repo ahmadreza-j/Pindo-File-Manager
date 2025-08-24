@@ -1,8 +1,7 @@
-import React from 'react';
-import { FSProvider } from './state/fsContext';
-import { Tree } from './components/Tree';
-import { Toasts } from './components/Toasts';
-import './App.css';
+import { FSProvider } from "./state/fsContext";
+import { Tree } from "./components/Tree";
+import { Toasts } from "./components/Toasts";
+import "./App.css";
 
 function App() {
   return (

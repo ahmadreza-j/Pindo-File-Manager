@@ -1,4 +1,4 @@
-import { FSState, FolderNode, FileNode } from './fsTypes';
+import { FSState, FolderNode } from "./fsTypes";
 
 export const createInitialState = (): FSState => {
   const rootId = crypto.randomUUID();
@@ -13,70 +13,76 @@ export const createInitialState = (): FSState => {
     [rootId]: {
       id: rootId,
       parentId: null,
-      type: 'folder' as const,
-      name: 'Root',
-      children: [documentsId, projectsId]
+      type: "folder" as const,
+      name: "Root",
+      children: [documentsId, projectsId],
     },
     [documentsId]: {
       id: documentsId,
       parentId: rootId,
-      type: 'folder' as const,
-      name: 'Documents',
-      children: [notesId, workId]
+      type: "folder" as const,
+      name: "Documents",
+      children: [notesId, workId],
     },
     [projectsId]: {
       id: projectsId,
       parentId: rootId,
-      type: 'folder' as const,
-      name: 'Projects',
-      children: [appId]
+      type: "folder" as const,
+      name: "Projects",
+      children: [appId],
     },
     [workId]: {
       id: workId,
       parentId: documentsId,
-      type: 'folder' as const,
-      name: 'Work',
-      children: [reportId]
+      type: "folder" as const,
+      name: "Work",
+      children: [reportId],
     },
     [notesId]: {
       id: notesId,
       parentId: documentsId,
-      type: 'file' as const,
-      name: 'notes',
-      ext: 'txt'
+      type: "file" as const,
+      name: "notes",
+      ext: "txt",
     },
     [reportId]: {
       id: reportId,
       parentId: workId,
-      type: 'file' as const,
-      name: 'report',
-      ext: 'pdf'
+      type: "file" as const,
+      name: "report",
+      ext: "pdf",
     },
     [appId]: {
       id: appId,
       parentId: projectsId,
-      type: 'file' as const,
-      name: 'app',
-      ext: 'js'
-    }
+      type: "file" as const,
+      name: "app",
+      ext: "js",
+    },
   };
 
   return {
     nodes,
-    rootId
+    rootId,
   };
 };
 
-export const deleteNodeRecursive = (state: FSState, nodeId: string): FSState => {
+export const deleteNodeRecursive = (
+  state: FSState,
+  nodeId: string
+): FSState => {
   const node = state.nodes[nodeId];
   if (!node) return state;
 
   const newNodes = { ...state.nodes };
 
-  if (node.type === 'folder') {
+  if (node.type === "folder") {
     // Recursively delete all children
-    node.children.forEach(childId => {
-      const childResult = deleteNodeRecursive({ nodes: newNodes, rootId: state.rootId }, childId);
+    node.children.forEach((childId) => {
+      const childResult = deleteNodeRecursive(
+        { nodes: newNodes, rootId: state.rootId },
+        childId
+      );
       Object.assign(newNodes, childResult.nodes);
     });
   }
@@ -84,8 +90,8 @@ export const deleteNodeRecursive = (state: FSState, nodeId: string): FSState => 
   // Remove from parent's children array
   if (node.parentId) {
     const parent = newNodes[node.parentId] as FolderNode;
-    if (parent && parent.type === 'folder') {
-      parent.children = parent.children.filter(id => id !== nodeId);
+    if (parent && parent.type === "folder") {
+      parent.children = parent.children.filter((id) => id !== nodeId);
     }
   }
 
@@ -94,13 +100,17 @@ export const deleteNodeRecursive = (state: FSState, nodeId: string): FSState => 
 
   return {
     ...state,
-    nodes: newNodes
+    nodes: newNodes,
   };
 };
 
-export const addNodeToParent = (state: FSState, parentId: string, nodeId: string): FSState => {
+export const addNodeToParent = (
+  state: FSState,
+  parentId: string,
+  nodeId: string
+): FSState => {
   const parent = state.nodes[parentId];
-  if (!parent || parent.type !== 'folder') return state;
+  if (!parent || parent.type !== "folder") return state;
 
   const newNodes = { ...state.nodes };
   const newParent = { ...parent };
@@ -109,6 +119,6 @@ export const addNodeToParent = (state: FSState, parentId: string, nodeId: string
 
   return {
     ...state,
-    nodes: newNodes
+    nodes: newNodes,
   };
 };

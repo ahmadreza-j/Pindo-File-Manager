@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import { useFS } from '../state/fsContext';
+import { type FormEvent, type FC, type MouseEvent, useState } from "react";
+import { useFS } from "../state/fsContext";
 
 interface DialogCreateFileProps {
   parentId: string;
   onClose: () => void;
 }
 
-export const DialogCreateFile: React.FC<DialogCreateFileProps> = ({
+export const DialogCreateFile: FC<DialogCreateFileProps> = ({
   parentId,
-  onClose
+  onClose,
 }) => {
   const { dispatch } = useFS();
-  const [name, setName] = useState('');
-  const [ext, setExt] = useState('');
+  const [name, setName] = useState("");
+  const [ext, setExt] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     dispatch({
-      type: 'ADD_FILE',
-      payload: { parentId, name, ext }
+      type: "ADD_FILE",
+      payload: { parentId, name, ext },
     });
     onClose();
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -34,7 +34,9 @@ export const DialogCreateFile: React.FC<DialogCreateFileProps> = ({
       <div className="dialog">
         <div className="dialog-header">
           <h3>Create New File</h3>
-          <button onClick={onClose} className="close-btn">×</button>
+          <button onClick={onClose} className="close-btn">
+            ×
+          </button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
