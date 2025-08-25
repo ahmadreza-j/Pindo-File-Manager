@@ -22,7 +22,7 @@ The application manages a hierarchical file system with:
 - **FileNode**: `{ id, parentId, type:"file", name, ext }`
 - Files cannot have children, only folders can contain other nodes
 
-### Expected File Structure
+### Actual File Structure
 ```
 /src
   /components
@@ -33,6 +33,7 @@ The application manages a hierarchical file system with:
     DialogRenameFile.tsx
     ConfirmDeleteDialog.tsx
     Toasts.tsx
+    ErrorBoundary.tsx
   /state
     fsTypes.ts
     fsReducer.ts
@@ -40,38 +41,47 @@ The application manages a hierarchical file system with:
     validators.ts
     storage.ts
     helpers.ts
-  /icons
+  /constants
+    index.ts
   App.tsx
+  App.css
+  index.css
   main.tsx
-index.html
 ```
 
 ## Development Commands
 
-Since this is a new project, the standard React development commands will be:
 - `npm install` - Install dependencies
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run test` - Run tests (if configured)
-- `npm run lint` - Run linter (if configured)
+- `npm run dev` - Start development server (Vite)
+- `npm run build` - TypeScript compile + Vite build for production
+- `npm run lint` - ESLint with TypeScript support (--max-warnings 0)
+- `npm run preview` - Preview production build locally
 
 ## Key Implementation Requirements
 
 ### State Management
-Implement reducer actions:
-- `ADD_FOLDER(parentId, name)`
-- `ADD_FILE(parentId, name, ext)`
-- `RENAME_FILE(fileId, newName, newExt)`
-- `DELETE_NODE(nodeId)` (handles recursive delete)
-- `HYDRATE_FROM_STORAGE()`
+The application uses React Context + useReducer pattern. All state mutations go through the reducer:
+- `ADD_FOLDER(parentId, name)` - Creates folder with validation
+- `ADD_FILE(parentId, name, ext)` - Creates file with validation
+- `RENAME_FILE(fileId, newName, newExt)` - Renames file with collision checking
+- `DELETE_NODE(nodeId)` - Recursive deletion with root protection
+- `HYDRATE_FROM_STORAGE()` - Loads state from localStorage
+- `ADD_TOAST/REMOVE_TOAST` - Toast notification management
+
+### Constants and Configuration
+- Constants are centralized in `src/constants/index.ts`
+- Forbidden characters: `/ \ : * ? " < > |`
+- Storage key: `"fs"`
+- Toast duration: 4000ms
+- Tree indentation: 20px per level
 
 ### Validation Rules (Enforced in Reducer)
 1. **Non-empty names** required for all operations
-2. **Forbidden characters**: `/ \ : * ? " < > |`
+2. **Forbidden characters**: Uses `FORBIDDEN_CHARS_REGEX` from constants
 3. **Uniqueness constraints**:
    - Folders: `name` must be unique among siblings
    - Files: `name + ext` combination must be unique among siblings
-   - Case-insensitive comparison recommended
+   - Case-insensitive comparison
    - Folder and file with same name can coexist
 
 ### UI Operations
@@ -87,11 +97,12 @@ Implement reducer actions:
 ## Critical Business Rules
 
 1. **Validation must be enforced in reducer** - UI cannot bypass validation
-2. **Root node is permanent** - disable delete/rename operations
+2. **Root node is permanent** - disable delete/rename operations  
 3. **Files cannot have children** - hide/disable add actions on file nodes
 4. **Recursive deletion** - folders delete all descendants with confirmation
-5. **Immediate UI updates** with localStorage persistence
-6. **Toast notifications** for success (green) and errors (red)
+5. **Immediate UI updates** with localStorage persistence after every mutation
+6. **Toast notifications** for success and errors (auto-dismiss after 4s)
+7. **Error boundary** wraps the entire application for crash protection
 
 ## Default Example Structure
 When localStorage is empty, seed with:

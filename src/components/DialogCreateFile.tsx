@@ -1,21 +1,57 @@
 import { type FormEvent, type FC, type MouseEvent, useState } from "react";
 import { useFS } from "../state/fsContext";
+import { validateFileCreation } from "../state/validators";
 
 interface DialogCreateFileProps {
   parentId: string;
   onClose: () => void;
 }
 
+const parseFilename = (fullFilename: string): { name: string; ext: string } => {
+  const trimmed = fullFilename.trim();
+  const lastDotIndex = trimmed.lastIndexOf('.');
+  
+  if (lastDotIndex === -1 || lastDotIndex === 0 || lastDotIndex === trimmed.length - 1) {
+    // No extension found, filename starts with dot, or filename ends with dot
+    return { name: trimmed, ext: "" };
+  }
+  
+  const name = trimmed.substring(0, lastDotIndex);
+  const ext = trimmed.substring(lastDotIndex + 1);
+  
+  return { name, ext };
+};
+
 export const DialogCreateFile: FC<DialogCreateFileProps> = ({
   parentId,
   onClose,
 }) => {
-  const { dispatch } = useFS();
-  const [name, setName] = useState("");
-  const [ext, setExt] = useState("");
+  const { state, dispatch } = useFS();
+  const [filename, setFilename] = useState("");
+  const [error, setError] = useState<string>("");
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    const { name, ext } = parseFilename(filename);
+    
+    // Validate before dispatching
+    const validationError = validateFileCreation(state, parentId, name, ext);
+    if (validationError) {
+      setError(validationError.message);
+      // Also dispatch toast for consistency
+      dispatch({
+        type: "ADD_TOAST",
+        payload: {
+          id: crypto.randomUUID(),
+          message: validationError.message,
+          type: "error"
+        }
+      });
+      return; // Keep dialog open
+    }
+
+    // Clear error and proceed
+    setError("");
     dispatch({
       type: "ADD_FILE",
       payload: { parentId, name, ext },
@@ -40,27 +76,21 @@ export const DialogCreateFile: FC<DialogCreateFileProps> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="fileName">File Name:</label>
+            <label htmlFor="fileName">File Name (with extension):</label>
             <input
               id="fileName"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter file name"
+              value={filename}
+              onChange={(e) => {
+                setFilename(e.target.value);
+                // Clear error when user types
+                if (error) setError("");
+              }}
+              placeholder="e.g. document.txt, script.js, README.md"
               autoFocus
               required
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="fileExt">Extension:</label>
-            <input
-              id="fileExt"
-              type="text"
-              value={ext}
-              onChange={(e) => setExt(e.target.value)}
-              placeholder="e.g. txt, js, md"
-              required
-            />
+            {error && <div className="error-message">{error}</div>}
           </div>
           <div className="dialog-actions">
             <button type="button" onClick={onClose} className="btn-cancel">

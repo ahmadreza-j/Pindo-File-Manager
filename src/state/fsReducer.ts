@@ -3,6 +3,7 @@ import {
   validateFolderCreation,
   validateFileCreation,
   validateFileRename,
+  validateFolderRename,
 } from "./validators";
 import { deleteNodeRecursive, addNodeToParent } from "./helpers";
 import { saveToStorage } from "./storage";
@@ -180,6 +181,65 @@ export const fsReducer = (state: AppState, action: FSAction): AppState => {
             `File renamed to "${trimmedName}.${trimmedExt}" successfully`,
             "success"
           ),
+        ],
+      };
+    }
+
+    case "RENAME_FOLDER": {
+      const { folderId, newName } = action.payload;
+
+      // Validate
+      const validationError = validateFolderRename(state, folderId, newName);
+      if (validationError) {
+        return {
+          ...state,
+          toasts: [
+            ...state.toasts,
+            createToast(validationError.message, "error"),
+          ],
+        };
+      }
+
+      const folder = state.nodes[folderId];
+      if (!folder || folder.type !== "folder") {
+        return {
+          ...state,
+          toasts: [...state.toasts, createToast("Folder not found", "error")],
+        };
+      }
+
+      // Prevent renaming root
+      if (folderId === state.rootId) {
+        return {
+          ...state,
+          toasts: [
+            ...state.toasts,
+            createToast("Cannot rename root folder", "error"),
+          ],
+        };
+      }
+
+      const trimmedName = newName.trim();
+
+      const newNodes = { ...state.nodes };
+      newNodes[folderId] = {
+        ...folder,
+        name: trimmedName,
+      };
+
+      const newState = {
+        ...state,
+        nodes: newNodes,
+      };
+
+      // Save to storage
+      saveToStorage({ nodes: newState.nodes, rootId: newState.rootId });
+
+      return {
+        ...newState,
+        toasts: [
+          ...state.toasts,
+          createToast(`Folder renamed to "${trimmedName}" successfully`, "success"),
         ],
       };
     }

@@ -42,6 +42,10 @@ export type FSAction =
       type: "RENAME_FILE";
       payload: { fileId: string; newName: string; newExt: string };
     }
+  | {
+      type: "RENAME_FOLDER";
+      payload: { folderId: string; newName: string };
+    }
   | { type: "DELETE_NODE"; payload: { nodeId: string } }
   | { type: "ADD_TOAST"; payload: Toast }
   | { type: "REMOVE_TOAST"; payload: { toastId: string } };

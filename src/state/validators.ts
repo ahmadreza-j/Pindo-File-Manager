@@ -21,11 +21,11 @@ export const validateExtension = (ext: string): ValidationError | null => {
   const trimmed = ext.trim();
 
   if (!trimmed) {
-    return { type: "empty", message: "Extension cannot be empty" };
+    return { type: "empty", message: "File extension is required" };
   }
 
   if (FORBIDDEN_CHARS.test(trimmed)) {
-    return { type: "invalid", message: "Contains forbidden characters" };
+    return { type: "invalid", message: "Extension contains forbidden characters" };
   }
 
   return null;
@@ -134,4 +134,18 @@ export const validateFileRename = (
   if (extError) return extError;
 
   return checkFileNameUnique(state, file.parentId!, newName, newExt, fileId);
+};
+
+export const validateFolderRename = (
+  state: FSState,
+  folderId: string,
+  newName: string
+): ValidationError | null => {
+  const folder = state.nodes[folderId];
+  if (!folder || folder.type !== "folder") return null;
+
+  const nameError = validateName(newName);
+  if (nameError) return nameError;
+
+  return checkFolderNameUnique(state, folder.parentId!, newName, folderId);
 };

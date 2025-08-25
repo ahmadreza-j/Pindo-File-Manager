@@ -4,6 +4,7 @@ import { NodeRow } from "./NodeRow";
 import { DialogCreateFolder } from "./DialogCreateFolder";
 import { DialogCreateFile } from "./DialogCreateFile";
 import { DialogRenameFile } from "./DialogRenameFile";
+import { DialogRenameFolder } from "./DialogRenameFolder";
 import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
 
 export const Tree: FC = () => {
@@ -11,9 +12,11 @@ export const Tree: FC = () => {
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [showCreateFile, setShowCreateFile] = useState(false);
   const [showRenameFile, setShowRenameFile] = useState(false);
+  const [showRenameFolder, setShowRenameFolder] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedParentId, setSelectedParentId] = useState<string>("");
   const [selectedFileId, setSelectedFileId] = useState<string>("");
+  const [selectedFolderId, setSelectedFolderId] = useState<string>("");
   const [selectedNodeId, setSelectedNodeId] = useState<string>("");
 
   const rootNode = state.nodes[state.rootId];
@@ -37,6 +40,11 @@ export const Tree: FC = () => {
     setShowRenameFile(true);
   };
 
+  const handleRenameFolder = (folderId: string) => {
+    setSelectedFolderId(folderId);
+    setShowRenameFolder(true);
+  };
+
   const handleDeleteNode = (nodeId: string) => {
     setSelectedNodeId(nodeId);
     setShowDeleteConfirm(true);
@@ -50,6 +58,7 @@ export const Tree: FC = () => {
         onAddFolder={handleAddFolder}
         onAddFile={handleAddFile}
         onRenameFile={handleRenameFile}
+        onRenameFolder={handleRenameFolder}
         onDeleteNode={handleDeleteNode}
       />
 
@@ -71,6 +80,13 @@ export const Tree: FC = () => {
         <DialogRenameFile
           fileId={selectedFileId}
           onClose={() => setShowRenameFile(false)}
+        />
+      )}
+
+      {showRenameFolder && (
+        <DialogRenameFolder
+          folderId={selectedFolderId}
+          onClose={() => setShowRenameFolder(false)}
         />
       )}
 

@@ -163,7 +163,7 @@
 }
 
 .dialog form {
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 0 1.5rem;
 }
 
 .form-group {
@@ -192,6 +192,13 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
@@ -199,6 +206,13 @@
   padding: 1rem 1.5rem;
   border-top: 1px solid #e9ecef;
   background-color: #f8f9fa;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Special styling for dialog actions inside forms */
+.dialog form .dialog-actions {
+  margin: 1rem -1.5rem 0 -1.5rem;
 }
 
 .btn-cancel {

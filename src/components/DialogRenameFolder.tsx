@@ -1,25 +1,39 @@
-import { type FormEvent, type FC, type MouseEvent, useState } from "react";
+import {
+  type FormEvent,
+  type FC,
+  type MouseEvent,
+  useState,
+  useEffect,
+} from "react";
 import { useFS } from "../state/fsContext";
-import { validateFolderCreation } from "../state/validators";
+import { validateFolderRename } from "../state/validators";
 
-interface DialogCreateFolderProps {
-  parentId: string;
+interface DialogRenameFolderProps {
+  folderId: string;
   onClose: () => void;
 }
 
-export const DialogCreateFolder: FC<DialogCreateFolderProps> = ({
-  parentId,
+export const DialogRenameFolder: FC<DialogRenameFolderProps> = ({
+  folderId,
   onClose,
 }) => {
   const { state, dispatch } = useFS();
   const [name, setName] = useState("");
   const [error, setError] = useState<string>("");
 
+  const folder = state.nodes[folderId];
+
+  useEffect(() => {
+    if (folder && folder.type === "folder") {
+      setName(folder.name);
+    }
+  }, [folder]);
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
     // Validate before dispatching
-    const validationError = validateFolderCreation(state, parentId, name);
+    const validationError = validateFolderRename(state, folderId, name);
     if (validationError) {
       setError(validationError.message);
       // Also dispatch toast for consistency
@@ -37,8 +51,8 @@ export const DialogCreateFolder: FC<DialogCreateFolderProps> = ({
     // Clear error and proceed
     setError("");
     dispatch({
-      type: "ADD_FOLDER",
-      payload: { parentId, name },
+      type: "RENAME_FOLDER",
+      payload: { folderId, newName: name },
     });
     onClose();
   };
@@ -49,11 +63,15 @@ export const DialogCreateFolder: FC<DialogCreateFolderProps> = ({
     }
   };
 
+  if (!folder || folder.type !== "folder") {
+    return null;
+  }
+
   return (
     <div className="dialog-backdrop" onClick={handleBackdropClick}>
       <div className="dialog">
         <div className="dialog-header">
-          <h3>Create New Folder</h3>
+          <h3>Rename Folder</h3>
           <button onClick={onClose} className="close-btn">
             ×
           </button>
@@ -81,7 +99,7 @@ export const DialogCreateFolder: FC<DialogCreateFolderProps> = ({
               Cancel
             </button>
             <button type="submit" className="btn-primary">
-              Create Folder
+              Rename Folder
             </button>
           </div>
         </form>

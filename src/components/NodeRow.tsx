@@ -9,6 +9,7 @@ interface NodeRowProps {
   onAddFolder: (parentId: string) => void;
   onAddFile: (parentId: string) => void;
   onRenameFile: (fileId: string) => void;
+  onRenameFolder: (folderId: string) => void;
   onDeleteNode: (nodeId: string) => void;
 }
 
@@ -18,6 +19,7 @@ const NodeRowComponent: FC<NodeRowProps> = ({
   onAddFolder,
   onAddFile,
   onRenameFile,
+  onRenameFolder,
   onDeleteNode,
 }) => {
   const { state } = useFS();
@@ -63,13 +65,22 @@ const NodeRowComponent: FC<NodeRowProps> = ({
             📂
           </button>
           {!isRoot && (
-            <button
-              onClick={() => onDeleteNode(node.id)}
-              title="Delete"
-              className="action-btn delete"
-            >
-              ❌
-            </button>
+            <>
+              <button
+                onClick={() => onRenameFolder(node.id)}
+                title="Rename"
+                className="action-btn"
+              >
+                ✎
+              </button>
+              <button
+                onClick={() => onDeleteNode(node.id)}
+                title="Delete"
+                className="action-btn delete"
+              >
+                ❌
+              </button>
+            </>
           )}
         </div>
       );
@@ -111,6 +122,7 @@ const NodeRowComponent: FC<NodeRowProps> = ({
                 onAddFolder={onAddFolder}
                 onAddFile={onAddFile}
                 onRenameFile={onRenameFile}
+                onRenameFolder={onRenameFolder}
                 onDeleteNode={onDeleteNode}
               />
             );
